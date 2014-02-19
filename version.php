@@ -27,6 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2014012800;
+$plugin->version  = 2014021900;
 $plugin->requires = 2013102500;
 $plugin->component = 'auth_oauth1';

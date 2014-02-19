@@ -85,18 +85,11 @@ class auth_plugin_oauth1 extends auth_plugin_base {
             //
             foreach ($attrmap as $key=>$value) {
                 // Check if attribute is present
-               /*  if (!isset($_SERVER[$value])){
-                    $result[$key] = '';
-                    continue;
-                } */
-// $userinfo->field_nome->und[0]->value
-                // $result[$key] = $this->get_first_string($_SERVER[$value]);
                 if (preg_match('/,/', $value)) {
                     $tmp = explode(',', $value);
                      $result[$key] = $userinfo->{$tmp[0]}->{$tmp[1]}[0]->{$tmp[2]};
-                    // $result[$key] = $userinfo->field_citta->und[0]->value;
                 } else {
-                    $result[$key] = $value;
+                    $result[$key] = $userinfo->{$value};
                 }         
             }
         }
@@ -104,15 +97,6 @@ class auth_plugin_oauth1 extends auth_plugin_base {
     }
 
     function get_attributes() {
-        // $moodleattributes = array();
-        // $userfields = $this->userfields;
-        // foreach ($userfields as $field) {
-            // if (!empty($this->config->{"field_map_$field"})) {
-                // $moodleattributes[$field] = $this->config->{"field_map_$field"};
-            // }
-        // }
-        // $moodleattributes['username'] = $this->config->fielduser;
-        // return $moodleattributes;
         $moodleattributes = array();
         $customfields = $this->get_custom_user_profile_fields();
         if (!empty($customfields) && !empty($this->userfields)) {
@@ -170,7 +154,6 @@ class auth_plugin_oauth1 extends auth_plugin_base {
             $userinfo = $connection->post($cfg->apifunc);
           
             if (!empty($userinfo->{$cfg->username})) {
-                // $useremail = $userinfo->mail;
                 $user = $DB->get_record('user', array('username' => $userinfo->{$cfg->username}, 'deleted' => 0,
                     'mnethostid' => $CFG->mnet_localhost_id));
                 // Create the user if it doesn't exist.
@@ -179,32 +162,7 @@ class auth_plugin_oauth1 extends auth_plugin_base {
                     if ($CFG->authpreventaccountcreation) {
                         throw new moodle_exception("noaccountyet", "auth_oauth1");
                     }
-                    // Retrieve more information from the provider.
-                    // $newuser = new stdClass();
-                    // $newuser->auth = 'oauth1';
-                    // $username = $userinfo->uuid;
                     $username = $userinfo->{$cfg->username};
-                    // $newuser->username = $username;
-                    // $newuser->email = $userinfo->mail;
-                    // $newuser->lang = $userinfo->language;
-                    // if (!empty($userinfo->field_nome->und[0]->value)) {
-                        // $newuser->firstname = $userinfo->field_nome->und[0]->value;
-                    // }
-                    // if (!empty($userinfo->field_cognome->und[0]->value)) {
-                        // $newuser->lastname = $userinfo->field_cognome->und[0]->value;
-                    // }
-                    // if (!empty($userinfo->field_citta->und[0]->value)) {
-                        // $newuser->city = $userinfo->field_citta->und[0]->value;
-                    // }
-                    // if (!empty($userinfo->field_telefono->und[0]->value)) {
-                        // $newuser->phone1 = $userinfo->field_telefono->und[0]->value;
-                    // }
-                    // if (!empty($userinfo->field_cellulare->und[0]->value)) {
-                        // $newuser->phone1 = $userinfo->field_cellulare->und[0]->value;
-                    // }
-                    // if (!empty($userinfo->field_unit_organizzativa->und[0]->value)) {
-                        // $newuser->istitution = $userinfo->field_unit_organizzativa->und[0]->value;
-                    // }
                     create_user_record($username, '', 'oauth1');
                 } else {
                     $username = $user->username;
@@ -214,18 +172,13 @@ class auth_plugin_oauth1 extends auth_plugin_base {
                 add_to_log(SITEID, 'auth_oauth1', '', '', $username . '/' . $userid);
                 $user = authenticate_user_login($username, null);
                 if ($user) {
-                    //set a cookie to remember what auth provider was selected
-                    // setcookie('MOODLEOAUTH1_'.$CFG->sessioncookie, 'oauth1',
-                            // time()+(DAYSECS*60), $CFG->sessioncookiepath,
-                            // $CFG->sessioncookiedomain, $CFG->cookiesecure,
-                            // $CFG->cookiehttponly);
-                    //prefill more user information if new user
-                   
-                    if (!empty($newuser)) {
-                        $newuser->id = $user->id;
-                        $DB->update_record('user', $newuser);
-                        $user = (object) array_merge((array) $user, (array) $newuser);
-                    }
+                    // if (!empty($newuser)) {
+                        // $newuser->id = $user->id;
+                        // $newuser->id = $user->id;
+                        // $DB->update_record('user', $newuser);
+                        $DB->update_record('user', $user);
+                        // $user = (object) array_merge((array) $user, (array) $newuser);
+                    // }
 
                     complete_user_login($user);
                     // Create event for authenticated user.

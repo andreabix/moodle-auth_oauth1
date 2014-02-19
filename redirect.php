@@ -32,6 +32,7 @@ $cfg = get_config('auth/oauth1');
 
 $connection = new TwitterOAuth($cfg->apiurl, $cfg->baseurl, $cfg->consumer_key, $cfg->consumer_secret);
 $requesttoken = $connection->getRequestToken(auth_oauth1_callbackurl());
+
 $SESSION->oauth_token = $token = $requesttoken['oauth_token'];
 $SESSION->oauth_token_secret = $requesttoken['oauth_token_secret'];
 switch ($connection->http_code) {
